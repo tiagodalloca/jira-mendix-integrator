@@ -1,4 +1,4 @@
-(ns clj-kondo-test
+(ns user.clj-kondo-test
   (:require [malli.core :as m]
             [malli.clj-kondo :as mc]))
 
