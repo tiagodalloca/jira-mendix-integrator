@@ -1,0 +1,1 @@
+{:lint-as #:malli.schema{defn schema.core/defn}, :linters {:type-mismatch {:namespaces {clj-kondo-test {add {:arities {2 {:args [:number :number], :ret :string}}}}}}}}

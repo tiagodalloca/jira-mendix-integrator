@@ -64,3 +64,18 @@ flycheck_*.el
 
 # network security
 /network-security.data
+
+# clj-kondo
+/clj-kondo
+**/.clj-kondo/.cache
+performance.txt
+clj-kondo*.snap
+.planck_cache
+
+.DS_Store
+!corpus/**/*.jar
+lsp
+corpus/config_dir/.cache
+/.clj-kondo/clj-kondo
+/.lsp/
+clj-kondo.build_artifacts.txt
