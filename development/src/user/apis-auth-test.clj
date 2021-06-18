@@ -1,9 +1,11 @@
-(ns user.jira-auth-test
+(ns user.apis-auth-test
   (:require [jira-mendix-integrator.server :as server]
             [jira-mendix-integrator.server.handler :as server-handler]
             [clj-http.client :as http-client]
             [clojure.data.json :as json]
             ring.util.codec
+            [paos.wsdl :as wsdl]
+            [paos.service :as paos-service]
             
             [integrant.core :as ig]
             [integrant.repl :refer [clear go halt init prep reset reset-all]]))
@@ -88,7 +90,9 @@
         {:headers {"Authorization" (str "Bearer " access-token)
                    :content-type "application/json"}})
        (get :body)
-       (json/read-str)))
+       (json/read-str)
+       (nth 0)
+       (get "id")))
   ([]
    (get-cloudid @jira-access-token)))
 
@@ -106,7 +110,96 @@
       (get :body)
       (json/read-str)))
 
-()
+(defn http-jql
+  [access-token cloudid jql]
+  (-> (http-client/get
+       (str "https://api.atlassian.com/ex/jira/"
+            cloudid
+            "/rest/api/3/search/")
+       {:headers {"Authorization" (str "Bearer " access-token)
+                  :content-type "application/json"}
+        :query-params {"jql" jql}})
+      (get :body)
+      (json/read-str)))
+
+;; MENDIX
+
+(def mendix-api-key "3e84ca42-536b-4cdb-bf7a-15f706263a64")
+
+(def mendix-wsdl "https://docs.mendix.com/apidocs-mxsdk/apidocs/attachments/9535497/19398865.wsdl")
+
+(defonce mendix-soap-service (atom nil))
+
+(defn set-mendix-soap-service!
+  []
+  (reset! mendix-soap-service (wsdl/parse mendix-wsdl)))
+
+(defn mendix-get-sprints
+  []
+  (let [soap-service @mendix-soap-service
+        op (get-in soap-service ["StoriesAPISoap" :operations "GetSprints"])
+        url (get-in soap-service ["StoriesAPISoap" :url])
+        content-type (paos-service/content-type op)
+        headers (paos-service/soap-headers op)
+        op-mapping (paos-service/request-mapping op)
+        context (-> op-mapping
+                    (assoc-in
+                     ["Envelope" "Header" "authentication"]
+                     {"username" {:__value "PlatformAPIUser"}
+                      "password" {:__value "PlatformAPIPassword"}})
+                    (assoc-in
+                     ["Envelope" "Body" "GetSprints"]
+                     {"ProjectID" {:__value "1b474997-f874-41ea-af9e-99acfdfe6935"}
+                      "ApiKey" {:__value mendix-api-key}}))
+        body (paos-service/wrap-body op context)
+        parse-fn (partial paos-service/parse-response op)]
+    (try
+      (-> url
+          (http-client/post
+           {:content-type content-type
+            :headers headers
+            :body body})
+          :body          
+          parse-fn)
+      (catch clojure.lang.ExceptionInfo e
+        (->> e ex-data :body (paos-service/parse-fault op))))))
+
+(defn mendix-create-story
+  [{:keys [name description type]} sprint-id]
+  (let [soap-service @mendix-soap-service
+        op (get-in soap-service ["StoriesAPISoap" :operations "CreateStory"])
+        url (get-in soap-service ["StoriesAPISoap" :url])
+        content-type (paos-service/content-type op)
+        headers (paos-service/soap-headers op)
+        op-mapping (paos-service/request-mapping op)
+        context (-> op-mapping
+                    (assoc-in
+                     ["Envelope" "Header" "authentication"]
+                     {"username" {:__value "PlatformAPIUser"}
+                      "password" {:__value "PlatformAPIPassword"}})
+                    (assoc-in
+                     ["Envelope" "Body" "CreateStory"]
+                     {"Name" {:__value name}
+                      "Description" {:__value description}
+                      "StoryType" {:__value (condp type identity
+                                              :feature "Feature"
+                                              :bug "Bug"
+                                              "Feature")}
+                      "SprintID" {:__value sprint-id}
+                      "ProjectID" {:__value "1b474997-f874-41ea-af9e-99acfdfe6935"}
+                      "ApiKey" {:__value mendix-api-key}}))
+        body (paos-service/wrap-body op context)
+        parse-fn (partial paos-service/parse-response op)]
+    (try
+      (-> url
+          (http-client/post
+           {:content-type content-type
+            :headers headers
+            :body body})
+          :body          
+          parse-fn)
+      (catch clojure.lang.ExceptionInfo e
+        (->> e ex-data :body (paos-service/parse-fault op))))))
 
 (comment
   (prep)
