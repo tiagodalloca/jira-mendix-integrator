@@ -39,8 +39,7 @@
                             {:request request})))})))
 
 (defn create-story
-  [{:keys [name description type]}
-   sprint-id
+  [name description type sprint-id
    {:keys [soap-service api-key]}]
   (let [soap-service soap-service
         srv (get-in soap-service ["StoriesAPISoap" :operations "CreateStory"])
@@ -147,6 +146,9 @@
   #:integrations.mendix.story
   {:sprint-id (get-in sprints ["NewStoryID" "__value"])})
 
+(comment
+  (parse-story {"NewStoryID" {"__value" "4933426"}}))
+
 (def handlers
   {:integrations.mendix/get-sprint
    (fn [{soap-service :integrations.mendix/soap-service
@@ -165,9 +167,9 @@
         api-key :integrations.mendix/api-key}]
      (-> 
       (create-story
-       {:name name
-        :description description
-        :type type}
+       name
+       description
+       type
        sprint-id
        {:soap-service soap-service :api-key api-key})
       (http-request)
