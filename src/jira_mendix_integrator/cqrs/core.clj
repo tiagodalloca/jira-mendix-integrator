@@ -31,6 +31,16 @@
             (handle)
             (deliver handler-promise))))))
 
+(defn add-handlers
+  [dispatcher
+   handlers]
+  (doseq [[action-t h] handlers]
+    (add-handler
+     dispatcher
+     (if (fn? h)
+       {:action-t action-t :handle h}
+       (assoc h :action-t action-t)))))
+
 (defn remove-handler
   [dispatcher action-t]
   (backend-core/remove-handler dispatcher action-t))
