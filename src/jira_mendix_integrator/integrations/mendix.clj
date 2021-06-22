@@ -1,6 +1,7 @@
 (ns jira-mendix-integrator.integrations.mendix
   (:require [paos.service :as paos-service]
-            [jira-mendix-integrator.integrations.helpers :refer [http-request]]))
+            [jira-mendix-integrator.integrations.helpers :refer [http-request]]
+            clojure.string))
 
 (defn get-sprints-request
   [{:keys [soap-service api-key]}]
@@ -81,21 +82,22 @@
                    (ex-info (->> e ex-data :body (paos-service/parse-fault srv))
                             {:request request})))})))
 
-(defn- parse-sprints
-  [sprints]
-  (for [s sprints]
-    (let [sprint (get s "Sprints")]
-      #:integrations.mendix.sprint
-      {:sprint-id (get-in sprint ["SprintID" "__value"])
-       :end-date (get-in sprint ["EndDate" "__value"])
-       :is-active-sprint (get-in sprint ["IsActiveSprint" "__value"])
-       :has-stories (get-in sprint ["HasStories" "__value"])
-       :deleted (get-in sprint ["Deleted" "__value"])
-       :creation-date (get-in sprint ["CreationDate" "__value"])
-       :completed  (get-in sprint ["Completed" "__value"]),
-       :is-backlog (get-in sprint ["isBacklog" "__value"]),
-       :name  (get-in sprint ["Name" "__value"]),
-       :start-date (get-in sprint ["StartDate" "__value"])})))
+(defn ->clj-kw [ns str]
+  (->> (clojure.string/split str #"(?<=[a-z])(?=[A-Z])")
+       (map clojure.string/lower-case)
+       (clojure.string/join "-")
+       (keyword ns)))
+
+(defn- parse-mendix-obj [s ns]
+  (reduce-kv
+   (fn [acc k v]
+     (assoc acc (->clj-kw ns k) (get v "__value")))
+   {}
+   s))
+
+(defn- parse-sprints [ss]
+  (map #(parse-mendix-obj (get % "Sprints") "integrations.mendix.sprint") ss))
+
 
 (comment (parse-sprints [{"Sprints"
                           {"SprintID" {"__value" "4909320"},
@@ -118,33 +120,11 @@
                            "Completed" {"__value" "false"},
                            "isBacklog" {"__value" "true"},
                            "Name" {"__value" "Backlog"},
-                           "StartDate" {"__value" nil}}}])
-         ;; => ({:deleted "false",
-         ;;      :end-date "2021-07-05T02:59:59.000Z",
-         ;;      :name "Get started",
-         ;;      :completed "false",
-         ;;      :has-stories "true",
-         ;;      :is-backlog "false",
-         ;;      :creation-date "2021-06-21T13:42:24.264Z",
-         ;;      :sprint-id "4909320",
-         ;;      :start-date "2021-06-21T03:00:00.000Z",
-         ;;      :is-active-sprint "true"}
-         ;;     {:deleted "false",
-         ;;      :end-date nil,
-         ;;      :name "Backlog",
-         ;;      :completed "false",
-         ;;      :has-stories "true",
-         ;;      :is-backlog "true",
-         ;;      :creation-date "2021-06-21T13:42:24.189Z",
-         ;;      :sprint-id "4909319",
-         ;;      :start-date nil,
-         ;;      :is-active-sprint "false"})
-         )
+                           "StartDate" {"__value" nil}}}]))
 
 (defn- parse-story
-  [sprints]
-  #:integrations.mendix.story
-  {:sprint-id (get-in sprints ["NewStoryID" "__value"])})
+  [story]
+  (parse-mendix-obj story "integrations.mendix.story"))
 
 (comment
   (parse-story {"NewStoryID" {"__value" "4933426"}}))
