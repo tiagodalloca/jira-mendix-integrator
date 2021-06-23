@@ -17,8 +17,7 @@
   ["/auth"
    ["/jira-oauth-redirect"
     {:get
-     {:parameters {:query [:map [:code string?]]}
-      :handler (fn [request]
+     {:handler (fn [request]
                  (def request request)
                  {:body
                   (select-keys

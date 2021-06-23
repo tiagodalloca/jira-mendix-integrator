@@ -21,7 +21,7 @@
 
    ::handler {}
 
-   ::jira-redirect-uri "https://50df9ec8c908.ngrok.io/auth/jira-oauth-redirect"
+   ::jira-redirect-uri "https://64a8726ea3bd.ngrok.io/auth/jira-oauth-redirect"
 
    ::jira-integration
    {:instances #{"clj-repl-dalloca"}
@@ -30,7 +30,7 @@
     "hR8vp2JYgGUQBItgZ0HuB5JLXoPzpZWa"
     
     :client-secret
-    "y6D1X5nViht3FL3QQ4OUwyuNTJJ7LzOmg4tHgK_Ed5gKQYum586jJdAycTgEAgVx"
+    "bCy_P5WKRo_n4OmKo5JrZoRS8TU_3llEHOU2hShTjc--QHEslRUlS8UxDsTWxmYZ"
     
     :auth-redirect
     {:url "https://auth.atlassian.com/authorize"
@@ -149,5 +149,5 @@
 (defn setup-jira-instance!
   [integration-name]
   (exchange-jira-auth-code! integration-name)
-  ())
+  (set-jira-cloud-id! integration-name))
 
