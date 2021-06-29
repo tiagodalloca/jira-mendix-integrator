@@ -51,14 +51,31 @@
              :content-type "application/json"}
    :response-fn #(-> % :body (json/read-str) (nth 0) (get "id"))})
 
+(defn parse-issue
+  [{id "id" key "key"
+    {summary "summary" description "description"} "fields"
+    :as issue}]
+  {:id id
+   :key key
+   :summary summary
+   :description description
+   :sprint-id (get-in issue ["fields" "customfield_10020" 0 "id"])})
+
 (defn search-jql-request
   [jql {:keys [access-token cloud-id]} {:keys [url]}]
   {:url (str url cloud-id "/rest/api/3/search/")
-   :method :get
+   :method :post
    :headers {"Authorization" (str "Bearer " access-token)
              :content-type "application/json"}
-   :query-params {"jql" jql}
-   :response-fn #(-> % :body (json/read-str))})
+   :body (json/write-str {"jql" jql})
+   :response-fn #(-> % :body (json/read-str) (get "issues")
+                     (->> (map parse-issue)))
+   :error-fn
+   nil
+   ;; #(if (= (:status (ex-data %)) 404)
+   ;;    nil
+   ;;    (throw %))
+   })
 
 (defn integration-instance
   [instance-name]

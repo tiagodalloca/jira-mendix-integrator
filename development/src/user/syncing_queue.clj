@@ -151,3 +151,12 @@
   (exchange-jira-auth-code! integration-name)
   (set-jira-cloud-id! integration-name))
 
+
+(defn jira-query
+  [integration-name query]
+  (let [integration-map @jira-integration
+        instance (get-in integration-map [:instances integration-name])
+        request-deps (:api-request integration-map)
+        request (jira-integration/search-jql-request query instance request-deps)]
+    (integrations-helper/http-request request)))
+
