@@ -35,23 +35,30 @@
 
 (defn execute-interceptor
   [impl stage interceptor data]
-  (let [interceptor-f (get (syncing-interceptor impl interceptor) stage)]
+  (let [is-interceptor-instance? (associative? interceptor)
+        interceptor-f (get (if-not is-interceptor-instance?
+                             (syncing-interceptor impl interceptor)
+                             interceptor)
+                           stage)]
     (if interceptor-f
       (interceptor-f data)
       data)))
 
 (defn execute-command
-  [impl {:keys [command interceptors data]}]
-  (let [data-enter (reduce #(execute-interceptor impl :enter %2 %1) data interceptors)
-        data-command (syncing-command impl command data-enter)
-        data-leave (reduce #(execute-interceptor impl :leave %2 %1) data-command
-                           (reverse interceptors))]
-    data-leave))
+  [impl {:keys [command interceptors context]}]
+  (let [context
+        (reduce #(execute-interceptor impl :enter %2 %1) context interceptors)        
+        command-result (syncing-command impl command context)
+        context (assoc context :command-result command-result)
+        context (reduce #(execute-interceptor impl :leave %2 %1) context
+                        (reverse interceptors))]
+    context))
 
 (comment
   (defmethod syncing-interceptor [:test :put-number]
     [_ _]
-    {:enter (fn [data] (update data :numbers #(conj % (rand-int 10))))})
+    {:enter (fn [context] (update-in context [:command-data :numbers]
+                                    #(conj % (rand-int 10))))})
   (defmethod syncing-command [:test :sum-numbers]
     [_ _ {:keys [numbers] :as data}]
     (assoc data :sum-numbers (reduce + numbers)))
@@ -59,5 +66,5 @@
   (execute-command :test
                    {:command :sum-numbers
                     :interceptors [:put-number]
-                    :data {:numbers [1 2 3]}}))
+                    :context {:command-data {:numbers [1 2 3]}}}))
 

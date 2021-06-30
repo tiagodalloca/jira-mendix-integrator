@@ -3,9 +3,13 @@
             [jira-mendix-integrator.server.handler :as server-handler]
             [jira-mendix-integrator.integrations.jira :as jira-integration]
             [jira-mendix-integrator.integrations.helpers :as integrations-helper]
+            [jira-mendix-integrator.syncing :refer [execute-command execute-interceptor]]
             [jira-mendix-integrator.syncing.infer
              :refer [infer-entity-sync-command]
              :as syncing-infer]
+            [user.syncing-queue.syncing-impl :as syncing-impl]
+            [paos.wsdl :as wsdl]
+            [paos.service :as paos-service]
             
             [integrant.core :as ig]
             [integrant.repl :refer [clear go halt init prep reset reset-all]])
@@ -52,7 +56,12 @@
     {:url "https://api.atlassian.com/oauth/token/accessible-resources"}
 
     :api-request
-    {:url "https://api.atlassian.com/ex/jira/"}}})
+    {:url "https://api.atlassian.com/ex/jira/"}}
+
+   ::mendix-integration
+   {:api-key "3e84ca42-536b-4cdb-bf7a-15f706263a64"
+    :wsdl "https://docs.mendix.com/apidocs-mxsdk/apidocs/attachments/9535497/19398865.wsdl"
+    :soap-service nil}})
 
 (integrant.repl/set-prep! (constantly config))
 
@@ -169,6 +178,15 @@
         request (jira-integration/search-jql-request query instance request-deps)]
     (integrations-helper/http-request request)))
 
+(defonce mendix-integration (atom nil))
+
+(defmethod ig/init-key ::mendix-integration
+  [_ {:keys [wsdl] :as config}]
+  (if-not @mendix-integration
+    (let [soap-service (wsdl/parse wsdl)
+          config (assoc config :soap-service soap-service)]
+      (reset! mendix-integration config))
+    @mendix-integration))
 
 (comment
   (syncing-infer/infer-entity-sync-command
@@ -179,3 +197,17 @@
     :description nil,
     :sprint-id 1}
    nil))
+
+(comment
+  (let [command  (-> (syncing-infer/infer-entity-sync-command
+                      {:type :integrations.jira.entities/story,
+                       :id "10008",
+                       :key "TES-2",
+                       :summary "issue 2",
+                       :description nil,
+                       :sprint-id 1}
+                      nil)
+                     (assoc-in [:context :deps] @mendix-integration))
+        command-result (:command-result (execute-command ::syncing-impl/impl command))]
+    (doto command-result prn)))
+
