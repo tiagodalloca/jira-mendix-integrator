@@ -3,10 +3,16 @@
             [jira-mendix-integrator.server.handler :as server-handler]
             [jira-mendix-integrator.integrations.jira :as jira-integration]
             [jira-mendix-integrator.integrations.helpers :as integrations-helper]
+            [jira-mendix-integrator.syncing.infer
+             :refer [infer-entity-sync-command]
+             :as syncing-infer]
             
             [integrant.core :as ig]
             [integrant.repl :refer [clear go halt init prep reset reset-all]])
   (:import [java.util.concurrent ArrayBlockingQueue]))
+
+(comment
+  (clojure.tools.namespace.repl/refresh))
 
 (defn syncer-handler
   [top]
@@ -93,10 +99,12 @@
 
 (defmethod ig/init-key ::jira-integration
   [_ {:keys [instances] :as deps}]
-  (let [integration-instances
-        (into {} (map #(vector % (jira-integration/integration-instance %))) instances)]
-    (reset! jira-integration
-            (assoc deps :instances integration-instances))))
+  (if-not @jira-integration
+    (let [integration-instances
+          (into {} (map #(vector % (jira-integration/integration-instance %))) instances)]
+      (reset! jira-integration
+              (assoc deps :instances integration-instances)))
+    @jira-integration))
 
 (defn runtime-exec
   [command-str]
@@ -146,10 +154,11 @@
     (swap! jira-integration #(update-in % [:instances integration-name :cloud-id]
                                         (constantly cloud-id)))))
 
-(defn setup-jira-instance!
-  [integration-name]
-  (exchange-jira-auth-code! integration-name)
-  (set-jira-cloud-id! integration-name))
+(defn setup-jira-instances!
+  []
+  (doseq [[integration-name _] (:instances @jira-integration )]
+    (exchange-jira-auth-code! integration-name)
+    (set-jira-cloud-id! integration-name)))
 
 
 (defn jira-query
@@ -160,3 +169,13 @@
         request (jira-integration/search-jql-request query instance request-deps)]
     (integrations-helper/http-request request)))
 
+
+(comment
+  (syncing-infer/infer-entity-sync-command
+   {:type :integrations.jira.entities/jira-story,
+    :id "10008",
+    :key "TES-2",
+    :summary "issue 2",
+    :description nil,
+    :sprint-id 1}
+   nil))

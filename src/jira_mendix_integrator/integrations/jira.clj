@@ -55,7 +55,8 @@
   [{id "id" key "key"
     {summary "summary" description "description"} "fields"
     :as issue}]
-  {:id id
+  {:type :integrations.jira.entities/jira-story
+   :id id
    :key key
    :summary summary
    :description description
