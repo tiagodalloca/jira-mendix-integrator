@@ -18,9 +18,7 @@
 (comment
   (clojure.tools.namespace.repl/refresh))
 
-(defn syncer-handler
-  [top]
-  (prn top))
+(declare syncer-handler)
 
 (def config
   {::syncing-queue {:capacity 4}
@@ -61,9 +59,12 @@
    ::mendix-integration
    {:api-key "3e84ca42-536b-4cdb-bf7a-15f706263a64"
     :wsdl "https://docs.mendix.com/apidocs-mxsdk/apidocs/attachments/9535497/19398865.wsdl"
-    :soap-service nil}})
+    :soap-service nil}
 
-(integrant.repl/set-prep! (constantly config))
+   ::jira-query-producer {:queue (ig/ref ::syncing-queue)
+                          :period 2}})
+
+(integrant.repl/set-prep! (constantly config))>
 
 (defonce syncing-queue (atom nil))
 
@@ -210,4 +211,50 @@
                      (assoc-in [:context :deps] @mendix-integration))
         command-result (:command-result (execute-command ::syncing-impl/impl command))]
     (doto command-result prn)))
+
+(defonce queue (atom nil))
+
+(defn datetime-str [inst]
+  (let [formatter
+        (-> (java.time.format.DateTimeFormatter/ofPattern "yyyy/MM/dd HH:mm")
+            (.withZone (java.time.ZoneId/of "UTC-3")))]
+    (.format formatter inst)))
+
+(defn now-minus-minutes [minutes]
+  (-> (java.time.Instant/now) (.minusSeconds (* 60 minutes))))
+
+(defn jira-update [integration-name project-name str-datetime]
+  (doseq [issue (jira-query
+                 integration-name
+                 (str "project=" \" project-name \"
+                      " AND updated > " \" str-datetime \"))]
+    (.put @queue issue)))
+
+(defn syncer-handler
+  [issue]
+  (try
+    (println "iniciando sincronização")
+    (let [command  (-> (syncing-infer/infer-entity-sync-command issue nil)
+                       (assoc-in [:context :deps] @mendix-integration))
+          command-result (:command-result (execute-command ::syncing-impl/impl command))]
+      (doto command-result prn)
+      (println "finalizando sincronização"))
+    (catch Exception e
+      (prn e))))
+
+(defonce stop-jira-query-producer (atom nil))
+
+(defmethod ig/init-key ::jira-query-producer
+  [_ {:keys [period] queue-instance :queue}]
+  (reset! queue queue-instance)
+  (let [ms-delay (int (* 1000 60 period))]
+    (future
+      (try
+        (while (not @stop-jira-query-producer)
+          (jira-update "clj-repl-dalloca" "TES"
+                       (-> (now-minus-minutes period) (datetime-str)))
+          (Thread/sleep ms-delay))
+        (catch Exception e
+          (prn e))))))
+
 

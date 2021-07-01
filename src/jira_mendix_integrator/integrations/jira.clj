@@ -51,38 +51,63 @@
              :content-type "application/json"}
    :response-fn #(-> % :body (json/read-str) (nth 0) (get "id"))})
 
+(defn parse-description
+  [description]
+  (let [content (get description "content")
+        paragraph? #(-> % (get "type") (= "paragraph"))
+        text? #(-> % (get "text"))
+        reduce-content-text (fn [s t]
+                              (if-let [text (text? t)]
+                                (reduced text)
+                                s))
+        get-text (fn [content] (reduce reduce-content-text "" content))]
+    (->> content
+         (filter paragraph?)
+         (map #(-> % (get "content") get-text))
+         (clojure.string/join "\n\n"))))
+
+(comment
+  (parse-description
+   {"version" 1,
+    "type" "doc",
+    "content"
+    [{"type" "paragraph",
+      "content" [{"type" "text", "text" "vai até com uma descrição "}]}
+     {"type" "paragraph",
+      "content" [{"type" "text", "text" "oh a descrição ae"}]}]}))
+
 (defn parse-issue
   [{id "id" key "key"
     {summary "summary" description "description"} "fields"
     :as issue}]
-  {:type :integrations.jira.entities/jira-story
+  {:type :integrations.jira.entities/story
    :id id
    :key key
    :summary summary
-   :description description
+   :description (parse-description description)
    :sprint-id (get-in issue ["fields" "customfield_10020" 0 "id"])})
 
 (defn search-jql-request
-  [jql {:keys [access-token cloud-id]} {:keys [url]}]
-  {:url (str url cloud-id "/rest/api/3/search/")
-   :method :post
-   :headers {"Authorization" (str "Bearer " access-token)
-             :content-type "application/json"}
-   :body (json/write-str {"jql" jql})
-   :response-fn #(-> % :body (json/read-str) (get "issues")
-                     (->> (map parse-issue)))
-   :error-fn
-   nil
-   ;; #(if (= (:status (ex-data %)) 404)
-   ;;    nil
-   ;;    (throw %))
-   })
+[jql {:keys [access-token cloud-id]} {:keys [url]}]
+{:url (str url cloud-id "/rest/api/3/search/")
+ :method :post
+ :headers {"Authorization" (str "Bearer " access-token)
+           :content-type "application/json"}
+ :body (json/write-str {"jql" jql})
+ :response-fn #(-> % :body (json/read-str) (get "issues")
+                   (->> (map parse-issue)))
+ :error-fn
+ nil
+ ;; #(if (= (:status (ex-data %)) 404)
+ ;;    nil
+ ;;    (throw %))
+ })
 
 (defn integration-instance
-  [instance-name]
-  {:name instance-name
-   :state instance-name
-   :cloud-id nil
-   :code nil
-   :access-token nil})
+[instance-name]
+{:name instance-name
+ :state instance-name
+ :cloud-id nil
+ :code nil
+ :access-token nil})
 
