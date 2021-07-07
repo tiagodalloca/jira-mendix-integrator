@@ -134,6 +134,8 @@
   []
   (reset! mendix-soap-service (wsdl/parse mendix-wsdl)))
 
+(comment (set-mendix-soap-service!))
+
 (defn mendix-get-sprints
   []
   (let [soap-service @mendix-soap-service
@@ -163,6 +165,8 @@
           parse-fn)
       (catch clojure.lang.ExceptionInfo e
         (->> e ex-data :body (paos-service/parse-fault op))))))
+
+(comment (prn (mendix-get-sprints)))
 
 (defn mendix-create-story
   [{:keys [name description type]} sprint-id]

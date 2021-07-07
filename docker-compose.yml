@@ -7,11 +7,11 @@ services:
     container_name: postgres
     restart: 'always'
     ports:
-      - "5431:6666"
+      - "5431:5432"
     environment:
-      POSTGRES_USER: integrator
-      POSTGRES_DB: integrator_db
-      POSTGRES_PASSWORD: /run/secrets/postgres_password
+      - POSTGRES_USER=integrator
+      - POSTGRES_DB=integrator_db
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
     volumes:
       - ~/temp/jira-mendix-integrator/postgres_data:/var/lib/postgresql/data
     secrets:
