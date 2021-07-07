@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    build: ./db
+    container_name: postgres
+    restart: 'always'
+    ports:
+      - "5431:6666"
+    environment:
+      POSTGRES_USER: integrator
+      POSTGRES_DB: integrator_db
+      POSTGRES_PASSWORD: /run/secrets/postgres_password
+    volumes:
+      - ~/temp/jira-mendix-integrator/postgres_data:/var/lib/postgresql/data
+    secrets:
+      - postgres_password
+    
+
+  integrator:
+    restart: 'always'
+    ports:
+      - '3000:3000'
+    environment:
+      VERSION: ${JIRA_MENDIX_INTEGRATOR_VERSION}
+      POSTGRES_PASSWORD: /run/secrets/postgres_password
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    secrets:
+      - postgres_password
+
+secrets:
+  postgres_password:
+    file: ./secrets/POSTGRES_PASSWORD.txt

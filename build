@@ -1,0 +1,29 @@
+#!/bin/bash
+
+export $(egrep -v '^#' .env | xargs)
+
+build_jar() {
+		clojure -X:uberjar :version "\"${JIRA_MENDIX_INTEGRATOR_VERSION}\"" :jar jira-mendix-integrator-$JIRA_MENDIX_INTEGRATOR_VERSION-standalone.jar
+}
+
+build_docker() {
+    mkdir secrets/
+    touch secrets/POSTGRES_PASSWORD.txt
+
+    read -s -p "POSTGRES_PASSWORD: " POSTGRES_PASSWORD
+    printf "\n"
+    echo "$POSTGRES_PASSWORD" > secrets/POSTGRES_PASSWORD.txt
+    
+		docker-compose build
+}
+
+if [ "$1" == "jar" ]; then
+		build_jar
+
+elif [ "$1" == "docker" ]; then
+		build_docker
+else
+		build_jar
+		build_docker
+fi
+
