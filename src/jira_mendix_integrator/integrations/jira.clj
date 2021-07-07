@@ -88,26 +88,26 @@
    :sprint-id (get-in issue ["fields" "customfield_10020" 0 "id"])})
 
 (defn search-jql-request
-[jql {:keys [access-token cloud-id]} {:keys [url]}]
-{:url (str url cloud-id "/rest/api/3/search/")
- :method :post
- :headers {"Authorization" (str "Bearer " access-token)
-           :content-type "application/json"}
- :body (json/write-str {"jql" jql})
- :response-fn #(-> % :body (json/read-str) (get "issues")
-                   (->> (map parse-issue)))
- :error-fn
- nil
- ;; #(if (= (:status (ex-data %)) 404)
- ;;    nil
- ;;    (throw %))
- })
+  [jql {:keys [access-token cloud-id]} {:keys [url]}]
+  {:url (str url cloud-id "/rest/api/3/search/")
+   :method :post
+   :headers {"Authorization" (str "Bearer " access-token)
+             :content-type "application/json"}
+   :body (json/write-str {"jql" jql})
+   :response-fn #(-> % :body (json/read-str) (get "issues")
+                     (->> (map parse-issue)))
+   :error-fn
+   nil
+   ;; #(if (= (:status (ex-data %)) 404)
+   ;;    nil
+   ;;    (throw %))
+   })
 
 (defn integration-instance
-[instance-name]
-{:name instance-name
- :state instance-name
- :cloud-id nil
- :code nil
- :access-token nil})
+  [instance-name]
+  {:name instance-name
+   :state instance-name
+   :cloud-id nil
+   :code nil
+   :access-token nil})
 

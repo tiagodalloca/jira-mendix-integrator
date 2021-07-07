@@ -247,14 +247,21 @@
 (defmethod ig/init-key ::jira-query-producer
   [_ {:keys [period] queue-instance :queue}]
   (reset! queue queue-instance)
-  (let [ms-delay (int (* 1000 60 period))]
-    (future
-      (try
-        (while (not @stop-jira-query-producer)
-          (jira-update "clj-repl-dalloca" "TES"
-                       (-> (now-minus-minutes period) (datetime-str)))
-          (Thread/sleep ms-delay))
-        (catch Exception e
-          (prn e))))))
+  (comment
+    (let [ms-delay (int (* 1000 60 period))]
+      (future
+        (try
+          (while (not @stop-jira-query-producer)
+            (try (jira-update "clj-repl-dalloca" "TES"
+                              (-> (now-minus-minutes period) (datetime-str)))
+                 (catch Exception e
+                   (prn e)))
+            (Thread/sleep ms-delay))
+          (catch Exception e
+            (prn e)))))))
 
+(comment
+  (jira-update "clj-repl-dalloca" "TES"
+               (-> (now-minus-minutes 2)
+                   (datetime-str))))
 

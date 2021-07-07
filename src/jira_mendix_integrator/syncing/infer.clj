@@ -33,4 +33,3 @@
                {:jira-sprint-id jira-sprint-id
                 :dest [:command-data :sprint-id]}}}))
 
-
