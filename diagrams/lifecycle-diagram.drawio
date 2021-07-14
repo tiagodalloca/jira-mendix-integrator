@@ -1,13 +1,13 @@
-<mxfile host="app.diagrams.net" modified="2021-07-14T20:13:48.868Z" agent="5.0 (Windows)" etag="izm4yen0eWr1qDa4QshN" version="14.8.0" type="github">
+<mxfile host="app.diagrams.net" modified="2021-07-14T20:47:48.501Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.67" etag="r47rL5YF0fbeeIyEtLH-" version="14.8.6" type="github">
   <diagram name="Page-1" id="13e1069c-82ec-6db2-03f1-153e76fe0fe0">
-    <mxGraphModel dx="3131" dy="1964" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+    <mxGraphModel dx="2365" dy="1332" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="7baba1c4bc27f4b0-2" value="Queue" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
           <mxGeometry x="240" y="80" width="100" height="580" as="geometry" />
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-3" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" vertex="1" parent="7baba1c4bc27f4b0-2">
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-3" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" parent="7baba1c4bc27f4b0-2" vertex="1">
           <mxGeometry x="2.5" y="140" width="95" height="10" as="geometry" />
         </mxCell>
         <mxCell id="7baba1c4bc27f4b0-3" value="Synchronizer" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
@@ -15,6 +15,17 @@
         </mxCell>
         <mxCell id="7baba1c4bc27f4b0-4" value="DB" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
           <mxGeometry x="540" y="80" width="100" height="580" as="geometry" />
+        </mxCell>
+        <mxCell id="vzu1NjE-4L5EP2pD95p_-5" value="connecti with database&lt;br&gt;&amp;nbsp;Docker&lt;br&gt;and save data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="7baba1c4bc27f4b0-4">
+          <mxGeometry x="-0.0062" relative="1" as="geometry">
+            <mxPoint x="-120" y="150" as="sourcePoint" />
+            <mxPoint x="41" y="150" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-40" y="150" />
+              <mxPoint x="-40" y="150" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="7baba1c4bc27f4b0-5" value="Jira API" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
           <mxGeometry x="-50" y="80" width="100" height="580" as="geometry" />
@@ -43,32 +54,56 @@
         <mxCell id="7baba1c4bc27f4b0-45" value="Note" style="shape=note;whiteSpace=wrap;html=1;size=14;verticalAlign=top;align=left;spacingTop=-6;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
           <mxGeometry x="680" y="30" width="100" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-2" value="App Container (Docker)" style="swimlane;" vertex="1" parent="1">
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-2" value="App Container (Docker)" style="swimlane;" parent="1" vertex="1">
           <mxGeometry x="70" y="-20" width="420" height="690" as="geometry">
             <mxRectangle x="70" y="-20" width="160" height="23" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-13" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" vertex="1" parent="fsGh_cMMgrtnSyg-6Mho-2">
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-13" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" parent="fsGh_cMMgrtnSyg-6Mho-2" vertex="1">
           <mxGeometry x="25" y="230" width="110" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-10" value="&lt;div&gt;response&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="fsGh_cMMgrtnSyg-6Mho-7">
+        <mxCell id="vzu1NjE-4L5EP2pD95p_-2" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" vertex="1" parent="fsGh_cMMgrtnSyg-6Mho-2">
+          <mxGeometry x="295" y="250" width="95" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-10" value="&lt;div&gt;response&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" parent="1" source="fsGh_cMMgrtnSyg-6Mho-7" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="140" y="184.16666666666674" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-7" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" vertex="1" parent="1">
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-7" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" parent="1" vertex="1">
           <mxGeometry x="-22.5" y="167.5" width="45" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-8" value="&lt;div&gt;API call: &lt;br&gt;&lt;/div&gt;&lt;div&gt;check for updates&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.148;entryY=-0.417;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="fsGh_cMMgrtnSyg-6Mho-7">
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-8" value="&lt;div&gt;API call: &lt;br&gt;&lt;/div&gt;&lt;div&gt;check for updates&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.148;entryY=-0.417;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" target="fsGh_cMMgrtnSyg-6Mho-7" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="142" y="157" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-16" value="&lt;div&gt;put updates &lt;br&gt;&lt;/div&gt;&lt;div&gt;to queue&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.447;entryY=0.917;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="fsGh_cMMgrtnSyg-6Mho-13" target="fsGh_cMMgrtnSyg-6Mho-3">
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-16" value="&lt;div&gt;put updates &lt;br&gt;&lt;/div&gt;&lt;div&gt;to queue&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.447;entryY=0.917;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="fsGh_cMMgrtnSyg-6Mho-13" target="fsGh_cMMgrtnSyg-6Mho-3" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="fsGh_cMMgrtnSyg-6Mho-18" value="DB Container (Docker)" style="swimlane;" vertex="1" parent="1">
-          <mxGeometry x="515" y="-20" width="150" height="690" as="geometry" />
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-18" value="&#xa;&#xa;&#xa;" style="swimlane;startSize=30;" parent="1" vertex="1">
+          <mxGeometry x="520" y="-20" width="140" height="690" as="geometry" />
+        </mxCell>
+        <mxCell id="vzu1NjE-4L5EP2pD95p_-13" value="&lt;b&gt;DB DOCKER&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="fsGh_cMMgrtnSyg-6Mho-18">
+          <mxGeometry x="30" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vzu1NjE-4L5EP2pD95p_-4" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" vertex="1" parent="fsGh_cMMgrtnSyg-6Mho-18">
+          <mxGeometry x="25" y="260" width="90" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="vzu1NjE-4L5EP2pD95p_-3" value="&lt;div&gt;Synchronizer&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.447;entryY=0.917;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="vzu1NjE-4L5EP2pD95p_-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="300" y="225" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="300" y="230" />
+              <mxPoint x="408" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="vzu1NjE-4L5EP2pD95p_-6" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" vertex="1" parent="1">
+          <mxGeometry x="697.5" y="250" width="65" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="vzu1NjE-4L5EP2pD95p_-11" value="Response" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="630" y="370" width="70" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
