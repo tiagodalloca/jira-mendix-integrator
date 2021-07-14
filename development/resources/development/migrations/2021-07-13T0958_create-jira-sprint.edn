@@ -1,0 +1,13 @@
+{:up ["
+CREATE TABLE IF NOT EXISTS jira_sprint (
+id serial PRIMARY KEY,
+jira_cloud_id integer REFERENCES jira_cloud,
+self varchar(200),
+state varchar(50),
+name varchar(200),
+start_date timestamp with time zone,
+end_date timestamp with time zone
+)"]
+ :down ["
+DROP TABLE IF EXISTS jira_sprint
+"]}

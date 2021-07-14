@@ -4,6 +4,9 @@
             [clojure.java.io :as io]
             [ragtime.core :as ragtime]))
 
+(comment
+  (io/resource "development/migrations"))
+
 (defn uri-from-resource-file [file]
   (-> file
       io/resource
@@ -45,19 +48,15 @@
   [conn]
   (create-data-store conn))
 
-(defn migrate-new [resource-migrations-dir data-store]
-  (let [migrations (read-migrations resource-migrations-dir)
-        idx (ragtime/into-index migrations)]
-    (ragtime/migrate-all
-     data-store
-     idx migrations
-     {:strategy ragtime.strategy/apply-new})))
-
-(defn migrate-rebase [resource-migrations-dir data-store]
-  (let [migrations (read-migrations resource-migrations-dir)
-        idx (ragtime/into-index migrations)]
-    (ragtime/migrate-all
-     data-store
-     idx migrations
-     {:strategy ragtime.strategy/apply-new})))
+(defn migrate
+  ([resource-migrations-dir data-store
+    {:keys [strategy] :or {strategy ragtime.strategy/apply-new}}]
+   (let [migrations (read-migrations resource-migrations-dir)
+         idx (ragtime/into-index migrations)]
+     (ragtime/migrate-all
+      data-store
+      idx migrations
+      {:strategy strategy})))
+  ([resource-migrations-dir data-store]
+   (migrate resource-migrations-dir data-store {})))
 

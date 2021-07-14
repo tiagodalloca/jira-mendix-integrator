@@ -29,6 +29,7 @@
 
    ::handler {}
 
+   ;; http://68c2ce2861f8.ngrok.io
    ::jira-redirect-uri "https://64a8726ea3bd.ngrok.io/auth/jira-oauth-redirect"
 
    ::jira-integration

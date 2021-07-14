@@ -1,0 +1,8 @@
+{:up ["
+CREATE TABLE IF NOT EXISTS integration (
+id serial PRIMARY KEY,
+name varchar(100)
+)"]
+ :down ["
+DROP TABLE IF EXISTS integration
+"]}

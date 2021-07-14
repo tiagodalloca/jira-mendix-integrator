@@ -18,7 +18,7 @@
   (applied-migration-ids [store]
     (->> (jdbc/execute!
           connectable
-          ["SELECT migration_id FROM migration ORDER BY migration_id ASC"])
+          ["SELECT migration_id FROM migration ORDER BY timestamp DESC"])
          (into (list)
                (map :migration/migration_id)))))
 

@@ -1,0 +1,11 @@
+{:up ["
+CREATE TABLE IF NOT EXISTS jira_auth (
+id serial PRIMARY KEY,
+integration_id integer REFERENCES integration,
+state varchar(200),
+code varchar(200),
+access_token varchar(200)
+)"]
+ :down ["
+DROP TABLE IF EXISTS jira_auth
+"]}

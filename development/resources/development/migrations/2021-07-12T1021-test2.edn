@@ -1,2 +1,2 @@
 {:up ["CREATE TABLE IF NOT EXISTS test2 (id serial primary key)"]
- :down ["DROP TABLE test2"]}
+ :down ["DROP TABLE IF EXISTS test2"]}

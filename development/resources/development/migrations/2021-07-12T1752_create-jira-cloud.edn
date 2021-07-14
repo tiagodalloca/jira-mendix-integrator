@@ -1,0 +1,9 @@
+{:up ["
+CREATE TABLE IF NOT EXISTS jira_cloud (
+id serial PRIMARY KEY,
+integration_id integer REFERENCES integration,
+cloud_id varchar(100)
+)"]
+ :down ["
+DROP TABLE IF EXISTS jira_cloud
+"]}
