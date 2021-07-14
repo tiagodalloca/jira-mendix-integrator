@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2021-07-14T19:03:23.143Z" agent="5.0 (Windows)" etag="zk8iO2o39qx7x579Gt3n" version="14.8.0" type="github">
+<mxfile host="app.diagrams.net" modified="2021-07-14T20:13:48.868Z" agent="5.0 (Windows)" etag="izm4yen0eWr1qDa4QshN" version="14.8.0" type="github">
   <diagram name="Page-1" id="13e1069c-82ec-6db2-03f1-153e76fe0fe0">
-    <mxGraphModel dx="2285" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+    <mxGraphModel dx="3131" dy="1964" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -11,7 +11,7 @@
           <mxGeometry x="2.5" y="140" width="95" height="10" as="geometry" />
         </mxCell>
         <mxCell id="7baba1c4bc27f4b0-3" value="Synchronizer" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
-          <mxGeometry x="400" y="80" width="100" height="580" as="geometry" />
+          <mxGeometry x="360" y="80" width="100" height="580" as="geometry" />
         </mxCell>
         <mxCell id="7baba1c4bc27f4b0-4" value="DB" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" parent="1" vertex="1">
           <mxGeometry x="540" y="80" width="100" height="580" as="geometry" />
@@ -32,7 +32,7 @@
           <mxGeometry x="240" y="30" width="100" height="35" as="geometry" />
         </mxCell>
         <mxCell id="7baba1c4bc27f4b0-42" value="Note" style="shape=note;whiteSpace=wrap;html=1;size=14;verticalAlign=top;align=left;spacingTop=-6;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
-          <mxGeometry x="400" y="30" width="100" height="35" as="geometry" />
+          <mxGeometry x="360" y="30" width="100" height="35" as="geometry" />
         </mxCell>
         <mxCell id="7baba1c4bc27f4b0-43" value="Note" style="shape=note;whiteSpace=wrap;html=1;size=14;verticalAlign=top;align=left;spacingTop=-6;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
           <mxGeometry x="540" y="30" width="100" height="35" as="geometry" />
@@ -44,7 +44,9 @@
           <mxGeometry x="680" y="30" width="100" height="35" as="geometry" />
         </mxCell>
         <mxCell id="fsGh_cMMgrtnSyg-6Mho-2" value="App Container (Docker)" style="swimlane;" vertex="1" parent="1">
-          <mxGeometry x="70" y="-20" width="600" height="690" as="geometry" />
+          <mxGeometry x="70" y="-20" width="420" height="690" as="geometry">
+            <mxRectangle x="70" y="-20" width="160" height="23" as="alternateBounds" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="fsGh_cMMgrtnSyg-6Mho-13" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;" vertex="1" parent="fsGh_cMMgrtnSyg-6Mho-2">
           <mxGeometry x="25" y="230" width="110" height="10" as="geometry" />
@@ -64,6 +66,9 @@
         </mxCell>
         <mxCell id="fsGh_cMMgrtnSyg-6Mho-16" value="&lt;div&gt;put updates &lt;br&gt;&lt;/div&gt;&lt;div&gt;to queue&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.447;entryY=0.917;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="fsGh_cMMgrtnSyg-6Mho-13" target="fsGh_cMMgrtnSyg-6Mho-3">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fsGh_cMMgrtnSyg-6Mho-18" value="DB Container (Docker)" style="swimlane;" vertex="1" parent="1">
+          <mxGeometry x="515" y="-20" width="150" height="690" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
