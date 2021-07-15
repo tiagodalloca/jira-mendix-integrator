@@ -9,7 +9,7 @@
                      (map clojure.string/lower-case)
                      (clojure.string/join "-"))]
      (if ns
-       (keyword k-name ns)
+       (keyword ns k-name)
        (keyword k-name))))
   ([str]
    (->clj-kw str nil)))
@@ -25,7 +25,7 @@
    (parse-mendix-obj s nil)))
 
 (defn- parse-sprints [ss]
-  (map #(parse-mendix-obj (get % "Sprints") "integrations.mendix.sprint") ss))
+  (map #(parse-mendix-obj (get % "Sprints") "mendix.sprint") ss))
 
 
 (comment (parse-sprints [{"Sprints"
@@ -57,6 +57,26 @@
 
 (comment
   (parse-story {"NewStoryID" {"__value" "4933426"}}))
+
+(defn parse-story-type
+  [type]
+  (or
+   ({:feature "Feature"
+     :bug "Bug"}
+    type)
+   "Feature"))
+
+(comment
+  (parse-story-type :feature))
+
+(defn parse-story-status
+  [status]
+  (or
+   ({:open "Open"
+     :started "Started"
+     :done "Done"}
+    type)
+   "Open"))
 
 (defn get-sprints-request
   [{:keys [soap-service api-key]}]
@@ -113,10 +133,7 @@
                      ["Envelope" "Body" "CreateStory"]
                      {"Name" {:__value name}
                       "Description" {:__value description}
-                      "StoryType" {:__value (condp type identity
-                                              :feature "Feature"
-                                              :bug "Bug"
-                                              "Feature")}
+                      "StoryType" {:__value (parse-story-type type)}
                       "SprintID" {:__value sprint-id}
                       "ProjectID" {:__value "1b474997-f874-41ea-af9e-99acfdfe6935"}
                       "ApiKey" {:__value api-key}}))
@@ -141,28 +158,49 @@
                         (catch Exception _
                           (throw e)))))})))
 
-(comment (def handlers
-           {:integrations.mendix/get-sprint
-            (fn [{soap-service :integrations.mendix/soap-service
-                 api-key :integrations.mendix/api-key}]
-              (-> {:soap-service soap-service :api-key api-key}
-                  get-sprints-request
-                  (http-request)
-                  parse-sprints))
+(defn udpate-story
+  [story-id name description status story-type story-points sprint-id
+   {:keys [soap-service api-key]}]
+  (let [soap-service soap-service
+        srv (get-in soap-service ["StoriesAPISoap" :operations "UpdateStory"])
+        url (get-in soap-service ["StoriesAPISoap" :url])
+        content-type (paos-service/content-type srv)
+        headers (paos-service/soap-headers srv)
+        srv-mapping (paos-service/request-mapping srv)
+        context (-> srv-mapping
+                    (assoc-in
+                     ["Envelope" "Header" "authentication"]
+                     {"username" {:__value "PlatformAPIUser"}
+                      "password" {:__value "PlatformAPIPassword"}})
+                    (assoc-in
+                     ["Envelope" "Body" "UpdateStory"]
+                     {"StoryID" {:__value story-id}
+                      "Name" {:__value name}
+                      "Description" {:__value description}
+                      "Status" {:__value (parse-story-status status)}
+                      "StoryType" {:__value (parse-story-type story-type)}
+                      "Points" {:__value story-points}
+                      "ParentSprintID" {:__value sprint-id}
+                      "ProjectID" {:__value "1b474997-f874-41ea-af9e-99acfdfe6935"}
+                      "ApiKey" {:__value api-key}}))
+        body (paos-service/wrap-body srv context)
+        parse-fn (partial paos-service/parse-response srv)
+        request {:url url
+                 :method :post
+                 :content-type content-type
+                 :headers headers
+                 :body body}]
+    (merge
+     request
+     {:response-fn #(-> % :body parse-fn
+                        (get-in ["Envelope"
+                                 "Body"
+                                 "UpdateStoryResponse"])
+                        (parse-story))
+      :error-fn (fn [e]
+                  (throw
+                   (try (ex-info (->> e ex-data :body (paos-service/parse-fault srv))
+                                 {:request request})
+                        (catch Exception _
+                          (throw e)))))})))
 
-            :integrations.mendix/create-story
-            (fn [{name :integrations.mendix.story/name
-                 description :integrations.mendix.story/description
-                 type :integrations.mendix.story/type
-                 sprint-id :integration.mendix.sprint/sprint-id
-                 soap-service :integrations.mendix/soap-service
-                 api-key :integrations.mendix/api-key}]
-              (-> 
-               (create-story
-                name
-                description
-                type
-                sprint-id
-                {:soap-service soap-service :api-key api-key})
-               (http-request)
-               parse-story))}))

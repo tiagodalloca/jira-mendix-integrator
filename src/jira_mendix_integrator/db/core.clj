@@ -48,3 +48,11 @@
    conn
    (assoc where-map :delete-from table)))
 
+(defn insert-or-update!
+  [conn table key value]
+  (let [key-val (get value key)
+        r (execute! conn {:select key :from [table] :where [:= key key-val]})]
+    (if (or (nil? r) (empty? r))
+      (insert-into! conn table value)
+      (update! conn table {:set value
+                           :where [:= key key-val]}))))

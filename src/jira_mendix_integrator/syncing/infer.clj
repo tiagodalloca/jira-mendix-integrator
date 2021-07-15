@@ -5,31 +5,31 @@
   (fn [{:keys [type]} _] type))
 
 (defmethod infer-entity-sync-command
-  :integrations.jira.entities/story
+  :jira/story
   [{jira-summary :summary
     jira-description :description
     jira-sprint-id :sprint-id}
-   mendix-story]
+   db-jira-story]
   (cond
-    (nil? mendix-story)
-    {:interceptors [:integrations.local/jira-sprint-id-to-mendix
+    (nil? db-jira-story)
+    {:interceptors [:local/jira-sprint-id-to-mendix
 
-                    :integrations.local/persist
+                    :local/persist
 
                     {:leave (fn [{{:keys [new-story-id]}
-                                 :integrations.mendix/create-story
+                                 :mendix/create-story
                                  :keys [command-data]
                                  :as context}]
-                              (assoc-in context [:integrations.local/persist]
+                              (assoc-in context [:local/persist]
                                         (merge
                                          command-data
-                                         {:type :integrations.mendix.entities/story
+                                         {:type :mendix/story
                                           :story-id new-story-id})))}]
-     :command :integrations.mendix/create-story
+     :command :mendix/create-story
      :context {:command-data {:name jira-summary
                               :description jira-description
                               :type :feature}
-               :integrations.local/jira-sprint-id-to-mendix
+               :local/jira-sprint-id-to-mendix
                {:jira-sprint-id jira-sprint-id
                 :dest [:command-data :sprint-id]}}}))
 

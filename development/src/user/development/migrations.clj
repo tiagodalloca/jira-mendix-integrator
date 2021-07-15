@@ -28,6 +28,8 @@
       (migrations/migrate migrations-dir data-store
                           {:strategy ragtime.strategy/rebase}))))
 
+(comment (migrate-rebase))
+
 (defn applied-migrations
   []
   (with-open [conn (jdbc/get-connection pg-db-spec)]

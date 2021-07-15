@@ -80,7 +80,7 @@
   [{id "id" key "key"
     {summary "summary" description "description"} "fields"
     :as issue}]
-  {:type :integrations.jira.entities/story
+  {:type :jira/story
    :id id
    :key key
    :summary summary

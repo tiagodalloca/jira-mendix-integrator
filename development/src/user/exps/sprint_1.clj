@@ -1,15 +1,20 @@
-(ns user.syncing-queue
+(ns user.exps.sprint-1
   (:require [jira-mendix-integrator.server :as server]
             [jira-mendix-integrator.server.handler :as server-handler]
             [jira-mendix-integrator.integrations.jira :as jira-integration]
+            [jira-mendix-integrator.integrations.mendix :as mendix-integration]
             [jira-mendix-integrator.integrations.helpers :as integrations-helper]
             [jira-mendix-integrator.syncing :refer [execute-command execute-interceptor]]
             [jira-mendix-integrator.syncing.infer
              :refer [infer-entity-sync-command]
              :as syncing-infer]
+            [jira-mendix-integrator.db.core :as db]
+            [jira-mendix-integrator.integrations.helpers :refer [http-request]]
             [user.syncing-queue.syncing-impl :as syncing-impl]
+
             [paos.wsdl :as wsdl]
             [paos.service :as paos-service]
+            [next.jdbc :as jdbc]
             
             [integrant.core :as ig]
             [integrant.repl :refer [clear go halt init prep reset reset-all]])
@@ -20,17 +25,37 @@
 
 (declare syncer-handler)
 
+;;TODO
+;; x- db init/halt 15min
+;; c- fix integration/cloudid config 30min
+;; - create app jira-story from db jira-story 30min
+;; - prepare test with auth 30min
+;; - shouldnt create new jira-story (test) 15min
+;; - possible fixes 15min
+;; ---
+;; 2h
+;; - update logic? 1h
+
 (def config
   {::syncing-queue {:capacity 4}
+   
    ::syncer {:syncing-queue (ig/ref ::syncing-queue)
              :syncer-handler #'syncer-handler}
+
+   ::db {:dbtype "postgres"
+         :dbname "integrator_db"
+         :host "0.0.0.0"
+         :port 5431
+         :user "integrator"
+         :password "postgres"}
+
    ::server {:opts {:port 8989}
              :handler (ig/ref ::handler)}
 
    ::handler {}
 
-   ;; http://68c2ce2861f8.ngrok.io
-   ::jira-redirect-uri "https://64a8726ea3bd.ngrok.io/auth/jira-oauth-redirect"
+   ;; http://4c9a0bd197c6.ngrok.io
+   ::jira-redirect-uri "https://4c9a0bd197c6.ngrok.io/auth/jira-oauth-redirect"
 
    ::jira-integration
    {:instances #{"clj-repl-dalloca"}
@@ -65,7 +90,7 @@
    ::jira-query-producer {:queue (ig/ref ::syncing-queue)
                           :period 2}})
 
-(integrant.repl/set-prep! (constantly config))>
+(integrant.repl/set-prep! (constantly config))
 
 (defonce syncing-queue (atom nil))
 
@@ -77,15 +102,23 @@
 
 (defmethod ig/halt-key! ::syncing-queue
   [_ syncing-queue]
-  (.put syncing-queue ::stop))
+  (.put syncing-queue :stop))
 
 (defmethod ig/init-key ::syncer
   [_ {:keys [syncing-queue syncer-handler]}]
   (future
     (loop [top (.take syncing-queue)]      
-      (when-not (= ::stop top)
+      (when-not (= :stop top)
         (syncer-handler top)
         (recur (.take syncing-queue))))))
+
+(def db-ds nil)
+
+(defmethod ig/init-key ::db
+  [_ opts]
+  (let [db-instance (jdbc/get-datasource opts)]
+    (alter-var-root #'db-ds (fn [_] db-instance))
+    db-instance))
 
 (defmethod ig/halt-key! ::syncer
   [_ _]
@@ -192,7 +225,7 @@
 
 (comment
   (syncing-infer/infer-entity-sync-command
-   {:type :jira/jira-story,
+   {:type :jira/story,
     :id "10008",
     :key "TES-2",
     :summary "issue 2",
@@ -232,13 +265,29 @@
     (.put @queue issue)))
 
 (defn syncer-handler
-  [issue]
+  [{:keys [summary description] :as issue}]
   (try
     (println "iniciando sincronização")
-    (let [command  (-> (syncing-infer/infer-entity-sync-command issue nil)
-                       (assoc-in [:context :deps] @mendix-integration))
-          command-result (:command-result (execute-command ::syncing-impl/impl command))]
-      (doto command-result prn)
+    (db/insert-or-update!
+     db-ds :jira-story :key
+     (select-keys issue [:key :summary :description]))
+    (let [issue-key (:key issue)
+          db-jira-story
+          (-> (db/query db-ds
+                        {:select :* :from [:jira-story] :where [:= :key issue-key]})
+              first)
+          mendix-id (:jira-story/mendix-id db-jira-story)]
+      (if (not (doto mendix-id prn))
+        (let [request (mendix-integration/create-story
+                       summary description :feature "4909319" @mendix-integration)
+              {:keys [new-story-id]} (http-request request)
+              mendix-story-id (read-string new-story-id)]
+          (db/insert-or-update! db-ds :jira-story :key {:key issue-key
+                                                        :mendix-id mendix-story-id}))
+        (let [request (mendix-integration/udpate-story
+                       mendix-id summary description :open :feature "_1" "4909319"
+                       @mendix-integration)
+              response (http-request request)]))
       (println "finalizando sincronização"))
     (catch Exception e
       (prn e))))
@@ -262,7 +311,17 @@
             (prn e)))))))
 
 (comment
+  (open-auth "clj-repl-dalloca")
+
+  (set-jira-auth-code! "clj-repl-dalloca" "FOU_xmK4T4o0_sSL")
+
+  (setup-jira-instances!)
+
   (jira-update "clj-repl-dalloca" "TES"
-               (-> (now-minus-minutes 2)
-                   (datetime-str))))
+               (-> (now-minus-minutes 60)
+                   (datetime-str)))
+
+  (db/query db-ds {:select :* :from [:jira-story] :where [:= :key "TES-10"]})
+  
+  (db/update! db-ds :jira-story {:set {:mendix-id nil} :where [:= :key "TES-10"]}))
 

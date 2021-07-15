@@ -56,11 +56,29 @@ CREATE TABLE IF NOT EXISTS migration (
   (-> (db/query datasource {:select :* :from [:migration]})
       (doto prn))
   
-  (db/insert! datasource :migration {:migration-id "empty migration #1"})
+  (db/insert-into! datasource :migration {:migration-id "empty migration #1"})
 
   (db/update! datasource :migration {:set {:migration-id "modified migration #1"}
                                      :where [:= :migration-id "empty migration #1"]})
   
   (db/delete-from! datasource :migration
-                   {:where [:= :migration-id "modified migration #1"]}))
+                   {:where [:= :migration-id "modified migration #1"]})
+
+  (db/insert-into! datasource :jira-story {:key "TES-test2"
+                                           :summary "test"
+                                           :description "asdf"})
+  
+  (db/query datasource {:select :* :from [:jira-story]})
+  
+  (db/insert-or-update!
+   datasource
+   :jira-story :key
+   {:key "TES-test3"
+    :summary "test3"
+    :description "desc 3"})
+
+  (db/delete-from! datasource :jira-story
+                   {:where [:= :key "TES-test3"]})
+
+  (db/query datasource {:select :* :from [:jira-story] :where [:= :key "TES-test3"]}))
 

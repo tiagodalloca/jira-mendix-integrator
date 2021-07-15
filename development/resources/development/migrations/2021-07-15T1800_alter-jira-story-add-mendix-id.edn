@@ -1,0 +1,5 @@
+{:up ["
+ALTER TABLE jira_story ADD mendix_id integer"]
+ :down [ "
+ALTER TABLE jira_story DROP COLUMN mendix_id
+"]}
