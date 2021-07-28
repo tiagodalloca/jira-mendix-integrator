@@ -79,8 +79,9 @@
    "Open"))
 
 (defn get-sprints-request
-  [{:keys [soap-service api-key]}]
-  (let [soap-service soap-service
+  [{:keys [soap-service api-key project-id]}]
+  (let [project-id (or project-id "1b474997-f874-41ea-af9e-99acfdfe6935")
+        soap-service soap-service
         srv (get-in soap-service ["StoriesAPISoap" :operations "GetSprints"])
         url (get-in soap-service ["StoriesAPISoap" :url])
         content-type (paos-service/content-type srv)
@@ -93,7 +94,7 @@
                       "password" {:__value "PlatformAPIPassword"}})
                     (assoc-in
                      ["Envelope" "Body" "GetSprints"]
-                     {"ProjectID" {:__value "1b474997-f874-41ea-af9e-99acfdfe6935"}
+                     {"ProjectID" {:__value project-id}
                       "ApiKey" {:__value api-key}}))
         body (paos-service/wrap-body srv context)
         parse-fn (partial paos-service/parse-response srv)
@@ -117,8 +118,9 @@
 
 (defn create-story
   [name description type sprint-id
-   {:keys [soap-service api-key]}]
-  (let [soap-service soap-service
+   {:keys [soap-service api-key project-id]}]
+  (let [project-id (or project-id "1b474997-f874-41ea-af9e-99acfdfe6935")
+        soap-service soap-service
         srv (get-in soap-service ["StoriesAPISoap" :operations "CreateStory"])
         url (get-in soap-service ["StoriesAPISoap" :url])
         content-type (paos-service/content-type srv)
@@ -160,8 +162,9 @@
 
 (defn udpate-story
   [story-id name description status story-type story-points sprint-id
-   {:keys [soap-service api-key]}]
-  (let [soap-service soap-service
+   {:keys [soap-service api-key project-id]}]
+  (let [project-id (or project-id "1b474997-f874-41ea-af9e-99acfdfe6935")
+        soap-service soap-service
         srv (get-in soap-service ["StoriesAPISoap" :operations "UpdateStory"])
         url (get-in soap-service ["StoriesAPISoap" :url])
         content-type (paos-service/content-type srv)

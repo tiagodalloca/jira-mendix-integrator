@@ -1,14 +1,13 @@
 (ns user.apis-auth-test
-  (:require [jira-mendix-integrator.server :as server]
-            [jira-mendix-integrator.server.handler :as server-handler]
-            [clj-http.client :as http-client]
+  (:require [clj-http.client :as http-client]
             [clojure.data.json :as json]
-            ring.util.codec
-            [paos.wsdl :as wsdl]
-            [paos.service :as paos-service]
-            
             [integrant.core :as ig]
-            [integrant.repl :refer [clear go halt init prep reset reset-all]]))
+            [integrant.repl :refer [clear go halt init prep reset reset-all]]
+            [jira-mendix-integrator.http.handler :as server-handler]
+            [jira-mendix-integrator.http.server :as server]
+            [paos.service :as paos-service]
+            [paos.wsdl :as wsdl]
+            ring.util.codec))
 
 (def config
   {::server {:opts {:port 8989}

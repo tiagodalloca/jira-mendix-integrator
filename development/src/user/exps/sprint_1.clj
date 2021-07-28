@@ -1,24 +1,29 @@
 (ns user.exps.sprint-1
-  (:require [jira-mendix-integrator.server :as server]
-            [jira-mendix-integrator.server.handler :as server-handler]
+  (:require [integrant.core :as ig]
+            [integrant.repl :refer [clear go halt init prep reset reset-all]]
+            [jira-mendix-integrator.db.core :as db]
+            [jira-mendix-integrator.http.handler :as server-handler]
+            [jira-mendix-integrator.http.server :as server]
+            [jira-mendix-integrator.integrations.helpers
+             :as
+             integrations-helper
+             :refer
+             [http-request]]
             [jira-mendix-integrator.integrations.jira :as jira-integration]
             [jira-mendix-integrator.integrations.mendix :as mendix-integration]
-            [jira-mendix-integrator.integrations.helpers :as integrations-helper]
-            [jira-mendix-integrator.syncing :refer [execute-command execute-interceptor]]
+            [jira-mendix-integrator.syncing
+             :refer
+             [execute-command execute-interceptor]]
             [jira-mendix-integrator.syncing.infer
-             :refer [infer-entity-sync-command]
-             :as syncing-infer]
-            [jira-mendix-integrator.db.core :as db]
-            [jira-mendix-integrator.integrations.helpers :refer [http-request]]
-            [user.syncing-queue.syncing-impl :as syncing-impl]
-
-            [paos.wsdl :as wsdl]
-            [paos.service :as paos-service]
+             :as
+             syncing-infer
+             :refer
+             [infer-entity-sync-command]]
             [next.jdbc :as jdbc]
-            
-            [integrant.core :as ig]
-            [integrant.repl :refer [clear go halt init prep reset reset-all]])
-  (:import [java.util.concurrent ArrayBlockingQueue]))
+            [paos.service :as paos-service]
+            [paos.wsdl :as wsdl]
+            [user.syncing-queue.syncing-impl :as syncing-impl])
+  (:import java.util.concurrent.ArrayBlockingQueue))
 
 (comment
   (clojure.tools.namespace.repl/refresh))
@@ -243,7 +248,7 @@
                        :sprint-id 1}
                       nil)
                      (assoc-in [:context :deps] @mendix-integration))
-        command-result (:command-result (execute-command ::syncing-impl/impl command))]
+        command-result (:command-result (execute-command :syncing-impl/impl command))]
     (doto command-result prn)))
 
 (defonce queue (atom nil))

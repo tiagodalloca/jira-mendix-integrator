@@ -1,4 +1,4 @@
-(ns jira-mendix-integrator.server
+(ns jira-mendix-integrator.http.server
   (:require [ring.adapter.jetty :as jetty]))
 
 (defn start-server [{:keys [handler port] :as deps}]

@@ -1,16 +1,19 @@
-(ns jira-mendix-integrator.server.handler
+(ns jira-mendix-integrator.http.handler
   (:require
+   [jira-mendix-integrator.http.mendix.rest-interface.handler
+    :as mendix-rest-handler]
    [malli.util :as mu]
    [muuntaja.core :as m]
    reitit.coercion.malli
    [reitit.ring :as ring]
+   [reitit.http :as http]
    [reitit.ring.coercion :as coercion]
    reitit.ring.malli
    [reitit.ring.middleware.exception :as exception]
    [reitit.ring.middleware.multipart :as multipart]
    [reitit.ring.middleware.muuntaja :as muuntaja]
    [reitit.ring.middleware.parameters :as parameters]
-
+   [reitit.swagger-ui :as swagger-ui]
    [clojure.data.json :as json]))
 
 (defn- get-routes [deps]
@@ -18,7 +21,6 @@
    ["/jira-oauth-redirect"
     {:get
      {:handler (fn [request]
-                 (def request request)
                  {:body
                   (select-keys
                    request
@@ -46,15 +48,19 @@
                     (fn [ex request]
                       {:status 500
                        :body (ex-data ex)})
-                    ::exception/wrap (fn [handler e request]
-                                       (.printStackTrace e)
-                                       (handler e request))}))
+                    :exception/wrap (fn [handler e request]
+                                      (.printStackTrace e)
+                                      (handler e request))}))
                  muuntaja/format-request-middleware
                  coercion/coerce-request-middleware
                  multipart/multipart-middleware]}})
 
 (defn get-handler [deps]
-  (let [routes (get-routes deps)]
-    (ring/ring-handler
-     (ring/router routes options))))
+  (let [routes (get-routes deps)
+        handler (ring/ring-handler
+                 (ring/router routes options))]
+    (ring/routes
+     handler
+     (mendix-rest-handler/get-handler "/mendix-rest-interface" deps)
+     (ring/create-default-handler))))
 

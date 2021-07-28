@@ -1,19 +1,22 @@
 (ns user.syncing-queue
-  (:require [jira-mendix-integrator.server :as server]
-            [jira-mendix-integrator.server.handler :as server-handler]
-            [jira-mendix-integrator.integrations.jira :as jira-integration]
+  (:require [integrant.core :as ig]
+            [integrant.repl :refer [clear go halt init prep reset reset-all]]
+            [jira-mendix-integrator.http.handler :as server-handler]
+            [jira-mendix-integrator.http.server :as server]
             [jira-mendix-integrator.integrations.helpers :as integrations-helper]
-            [jira-mendix-integrator.syncing :refer [execute-command execute-interceptor]]
+            [jira-mendix-integrator.integrations.jira :as jira-integration]
+            [jira-mendix-integrator.syncing
+             :refer
+             [execute-command execute-interceptor]]
             [jira-mendix-integrator.syncing.infer
-             :refer [infer-entity-sync-command]
-             :as syncing-infer]
-            [user.syncing-queue.syncing-impl :as syncing-impl]
-            [paos.wsdl :as wsdl]
+             :as
+             syncing-infer
+             :refer
+             [infer-entity-sync-command]]
             [paos.service :as paos-service]
-            
-            [integrant.core :as ig]
-            [integrant.repl :refer [clear go halt init prep reset reset-all]])
-  (:import [java.util.concurrent ArrayBlockingQueue]))
+            [paos.wsdl :as wsdl]
+            [user.syncing-queue.syncing-impl :as syncing-impl])
+  (:import java.util.concurrent.ArrayBlockingQueue))
 
 (comment
   (clojure.tools.namespace.repl/refresh))
@@ -210,7 +213,7 @@
                        :sprint-id 1}
                       nil)
                      (assoc-in [:context :deps] @mendix-integration))
-        command-result (:command-result (execute-command ::syncing-impl/impl command))]
+        command-result (:command-result (execute-command :syncing-impl/impl command))]
     (doto command-result prn)))
 
 (defonce queue (atom nil))
@@ -237,7 +240,7 @@
     (println "iniciando sincronização")
     (let [command  (-> (syncing-infer/infer-entity-sync-command issue nil)
                        (assoc-in [:context :deps] @mendix-integration))
-          command-result (:command-result (execute-command ::syncing-impl/impl command))]
+          command-result (:command-result (execute-command :syncing-impl/impl command))]
       (doto command-result prn)
       (println "finalizando sincronização"))
     (catch Exception e
